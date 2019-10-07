@@ -4,7 +4,7 @@
 
 ## Prerequisite:
 > * Basic knowledge to Programming (Python).
-> * Basic knowledge of NoSQL databases since Firebase is a NoSQL.
+> * Basic knowledge of MySQL databases since Firebase is a MySQL.
 > * Basic knowledge of Electronics.
 
 ## Requirement:
