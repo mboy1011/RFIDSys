@@ -1,6 +1,11 @@
 # RFIDSys
 
-## It is a simple Python Web Based RFID App using Flask Framework and MaterializeCSS as Front End that works on Raspberry Pi 3 B+.
+<p><b>RFIDSys</b>It is a simple Python Web Based RFID App using Flask Framework and MaterializeCSS as Front End that works on Raspberry Pi 3 B+.</p>
+
+## Prerequisite:
+> * Basic knowledge to Programming (Python).
+> * Basic knowledge of NoSQL databases since Firebase is a NoSQL.
+> * Basic knowledge of Electronics.
 
 ## Requirement:
 [![Python3](https://www.python.org/static/img/python-logo.png)](https://www.python.org/downloads/)
