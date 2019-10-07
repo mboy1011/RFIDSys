@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+SQLAlchemy
+Jinja2
+gevent
+mfrc522
+netifaces
+Flask-SocketIO
+MySQLdb
+func_timeout
