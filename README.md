@@ -5,7 +5,7 @@
 ## Requirement:
 [![Python3](https://www.python.org/static/img/python-logo.png)](https://www.python.org/downloads/)
 [![Raspberry Pi 3 B+](https://www.raspberrypi.org/homepage-9df4b/favicon.png)](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)
-[![Flask]](https://palletsprojects.com/p/flask/)
+[![Flask](The Pallets Project)](https://palletsprojects.com/p/flask/)
 
 ## Installation:
 1. Connect your RFID-RC522 to your Raspberry Pi 3 using the diagram below:
