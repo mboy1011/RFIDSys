@@ -5,6 +5,7 @@ import sys
 from mfrc522 import SimpleMFRC522
 import netifaces as ni
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
 import json,time,signal,werkzeug,os
 from func_timeout import func_set_timeout,func_timeout
 from werkzeug.utils import secure_filename
@@ -36,9 +37,11 @@ socketio = SocketIO(app,async_mode=async_mode)
 reader = SimpleMFRC522()
 
 # Network Interface
-ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+
+# SQLAlchemy DB Connection
 engine = create_engine('mysql+mysqldb://root:password@localhost:3306/db_rfidsys')
-db = engine.connect()
+db = scoped_session(sessionmaker(bind=engine))
 # File Upload
 UPLOAD_FOLDER = './static/assets/img/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}  
@@ -50,22 +53,31 @@ def add_stud():
     lname = request.form['lname']
     fname = request.form['fname']
     rfid = request.form['rfid_no']
-    if request.method == 'POST': 
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            data = {'data':'No file part'}
+    if request.method == 'POST':
+        result = db.execute(f"SELECT * FROM tbl_useraccounts WHERE rfid_no = {rfid}").fetchall()
+        if result:
+            data = {'data':'Already Registered!'}
             return render_template('register.html',data=data)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            data = {'data':'No selected file'}
-            return render_template('register.html',data=data)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return render_template('register.html',data=filename)
-        return f'''Full Name:{lname+fname} RFID No:{rfid}'''
+        else:
+            # check if the post request has the file part
+            if 'file' not in request.files:
+                data = {'data':'No file part'}
+                return render_template('register.html',data=data)
+            file = request.files['file']
+            # if user does not select file, browser also
+            # submit a empty part without filename
+            if file.filename == '':
+                data = {'data':'No selected file'}
+                return render_template('register.html',data=data)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                imgurl = '/static/assets/img/'+filename
+                query = db.execute(f"INSERT INTO tbl_useraccounts (rfid_no,fname,lname,img) VALUES ('{rfid}','{fname}','{lname}','{imgurl}')")
+                db.commit()
+                data = {'data':'Successfully Registered!'}
+                return render_template('register.html',data=data)
+
     else:
         return redirect('/register')
 @app.route('/')
