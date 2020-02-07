@@ -16,6 +16,8 @@ import datetime
 
 display = lcddriver.lcd()
 #########
+import webbrowser
+import threading
 
 class InvalidUsage(Exception):
     status_code = 400
@@ -134,4 +136,6 @@ if __name__ == "__main__":
     app.register_error_handler(StatusDenied, error_handler)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     # FLASK_APP = "main"
-    socketio.run(app,debug=True,host=ip,port=3000)
+    url = "http://localhost:3000"
+    threading.Timer(3.25, lambda: webbrowser.open(url) ).start()
+    socketio.run(app,debug=True,host='localhost',port=3000)
