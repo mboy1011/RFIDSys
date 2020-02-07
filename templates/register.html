@@ -17,7 +17,7 @@
     <header>
             <nav>
             <div class="nav-wrapper green white-text">
-                <a href="#!" class="brand-logo center">RFIDSys</a>
+                <a href="#!" class="brand-logo center">Gate based RFID student attendance system</a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul class="right hide-on-med-and-down">
                     <li class=""><a href="/">Attendance <i class="material-icons left">credit_card</i></a></li>
@@ -35,14 +35,29 @@
         <div class="container">
             <form action="/add_student" method="POST" enctype="multipart/form-data">
                 <h3 class="header pink-text">Register<i class="material-icons medium left">person_add</i></h3>
+                
                 <div class="input-field col s12 l6">
                     <input type="text" id="first_name" class="validate" name="fname" required>
                     <label for="first_name">First Name</label>
                 </div>
                 <div class="input-field col s12 l6">
+                    <input type="text" id="Middle_name" class="validate" name="mname" required>
+                    <label for="Middle_name">Middle Name</label>
+                </div>
+                
+                <div class="input-field col s12 l6">
                     <input type="text" id="last_name" class="validate" name="lname" required>
                     <label for="last_name">Last Name</label>
                 </div>
+                <div class="input-field col s12 l6">
+                    <input type="text" id="Grade_level" class="validate" name="gradelevel" required>
+                    <label for="Grade_level">Grade level</label>
+                </div>
+                <div class="input-field col s12 16">
+                    <input type="text" id="Address" class="validate" name="address" required>
+                    <label for="Address">Address</label>
+                </div>
+                
                 <div class="file-field input-field">
                     <div class="btn" id="chkBtn">
                         <span><i class="material-icons">credit_card</i></span>
@@ -78,7 +93,7 @@
     <h1 id="name"></h1>
     <!-- MCSS Offline -->
     <script src="{{url_for('static',filename='assets/js/materialize-css.min.js')}}"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{{url_for('static',filename='assets/js/axios.min.js')}}"></script>
     <script type="text/javascript" charset="utf-8">
         M.AutoInit();
         let ch = document.querySelector("#chkBtn");

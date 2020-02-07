@@ -9,6 +9,13 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 import json,time,signal,werkzeug,os
 from func_timeout import func_set_timeout,func_timeout
 from werkzeug.utils import secure_filename
+## i2c ##
+import lcddriver
+import time
+import datetime
+
+display = lcddriver.lcd()
+#########
 
 class InvalidUsage(Exception):
     status_code = 400
@@ -37,7 +44,7 @@ socketio = SocketIO(app,async_mode=async_mode)
 reader = SimpleMFRC522()
 
 # Network Interface
-ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
 # SQLAlchemy DB Connection
 engine = create_engine('mysql+mysqldb://root:password@localhost:3306/db_rfidsys')
@@ -52,6 +59,9 @@ def allowed_file(filename):
 def add_stud():
     lname = request.form['lname']
     fname = request.form['fname']
+    mname = request.form['mname']
+    gradelevel = request.form['gradelevel']
+    address = request.form['address']
     rfid = request.form['rfid_no']
     if request.method == 'POST':
         result = db.execute(f"SELECT * FROM tbl_useraccounts WHERE rfid_no = {rfid}").fetchall()
@@ -73,7 +83,7 @@ def add_stud():
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 imgurl = '/static/assets/img/'+filename
-                query = db.execute(f"INSERT INTO tbl_useraccounts (rfid_no,fname,lname,img) VALUES ('{rfid}','{fname}','{lname}','{imgurl}')")
+                query = db.execute(f"INSERT INTO tbl_useraccounts (rfid_no,fname,lname,img,address,mname,gradelevel) VALUES ('{rfid}','{fname}','{lname}','{imgurl}','{address}','{mname}','{gradelevel}')")
                 db.commit()
                 data = {'data':'Successfully Registered!'}
                 return render_template('register.html',data=data)
@@ -92,7 +102,7 @@ def register():
 @func_set_timeout(3.0)
 def check():
     ids = reader.read_id()
-    query = db.execute(f"SELECT DATE_FORMAT(date_added,'%%M %%d %%Y %%l:%%i %%p') as date_added,img,lname,fname,u_id,rfid_no FROM tbl_useraccounts WHERE rfid_no = {ids}")
+    query = db.execute(f"SELECT DATE_FORMAT(date_added,'%%M %%d %%Y %%l:%%i %%p') as date_added,img,lname,fname,u_id,rfid_no,address,mname,gradelevel FROM tbl_useraccounts WHERE rfid_no = {ids}")
     data = query.fetchone()
     if data:
         json_data = json.dumps(dict(data))
@@ -125,4 +135,3 @@ if __name__ == "__main__":
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     # FLASK_APP = "main"
     socketio.run(app,debug=True,host=ip,port=3000)
-    

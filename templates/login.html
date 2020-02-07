@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>GCC RFID monitoring system</title>
     <!-- MCSS Offline -->
     <link rel="stylesheet" href="{{url_for('static',filename='assets/css/materializecss.min.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='assets/css/materializecss-icons.css')}}">
@@ -17,7 +17,7 @@
     <header>
             <nav>
             <div class="nav-wrapper green white-text">
-                <a href="#!" class="brand-logo center">RFIDSys</a>
+                <a href="#!" class="brand-logo center">Gate based RFID student monitoring system</a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul class="right hide-on-med-and-down">
                     <li><a href="/register">Register <i class="material-icons left">person_add</i></a></li>
@@ -31,13 +31,14 @@
     </header>
     <main>
         <div class="container">
+             <h2 class="header black-text"><i class="material-icons medium center">GINGOOG CITY COLLEGES STUDENTS</i></h2>
             <div class="row">
-                <div class="col s5 offset-s5">
-                    <img id="images" class="materialboxed" data-caption="A picture of a way with a group of trees in a park" width="250" src="/static/assets/img/gcclogo.png">
-                    <h4 class="header pink-text" id="name"></h4>
-                    <button class="btn" type="button" name="check" id="check">Check In</button>
-                    <button class="btn" type="button" name="check" id="check">Check Out</button>
+                <div class="col s3 offset-s3">
+                    <img id="images" class="materialboxed" data-caption="Gingoog city colleges" width="350" src="/static/assets/img/logo.png">
+                    <h4 class="header pink-text" id="name"style=" width: 350px; height: 100px;"></h4>
+                    <button class="btn" type="button" name="check" id="check">Click here</button>
                 </div>
+                
             </div>
         </div>
         <div id="modal1" class="modal bottom-sheet">
@@ -80,11 +81,11 @@
                 var obj = JSON.parse(datas);
                 if(obj.data == 'n/a'){
                     M.toast({html:"RFID Number Not Found!"})
-                    images.src = '/static/assets/img/gcclogo.png';
+                    images.src = '/static/assets/img/logo.png';
                     name.innerText = '';
                     instance.close();
                 }else{
-                    name.innerText = obj.fname+', '+obj.lname+' | '+obj.rfid_no;
+                    name.innerText = obj.fname +'   ' + obj.mname + '  ' + obj.lname + '  ||  '  + obj.gradelevel  ;
                     images.src = obj.img;
                     instance.close();
                     console.log(obj);
