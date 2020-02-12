@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>GCC RFID monitoring system</title>
+    <title>GCCNHS Monitoring system</title>
     <!-- MCSS Offline -->
     <link rel="stylesheet" href="{{url_for('static',filename='assets/css/materializecss.min.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='assets/css/materializecss-icons.css')}}">
@@ -16,8 +16,8 @@
 <body>
     <header>
             <nav>
-            <div class="nav-wrapper green white-text">
-                <a href="#!" class="brand-logo center">Gate based RFID student monitoring system</a>
+            <div class="nav-wrapper blue white-text">
+                <a href="#!" class="brand-logo center">GCCNHS RFID SYSTEM</a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul class="right hide-on-med-and-down">
                     <li><a href="/register">Register <i class="material-icons left">person_add</i></a></li>
@@ -31,12 +31,13 @@
     </header>
     <main>
         <div class="container">
-             <h2 class="header black-text"><i class="material-icons medium center">GINGOOG CITY COLLEGES STUDENTS</i></h2>
+             <h1 class="header black-text"><i>STUDENTS MONITORING SYSTEM</i></h1>
             <div class="row">
                 <div class="col s3 offset-s3">
-                    <img id="images" class="materialboxed" data-caption="Gingoog city colleges" width="350" src="/static/assets/img/logo.png">
+                    <img id="images" class="materialboxed" data-caption="Gingoog city colleges" width="350" src="/static/assets/img/gccnhslogo.png">
                     <h4 class="header pink-text" id="name"style=" width: 350px; height: 100px;"></h4>
-                    <button class="btn" type="button" name="check" id="check">Click here</button>
+                    <button class="btn" type="button" name="check" id="checkIn">Check In</button>
+                    <button class="btn" type="button" name="check" id="checkOut">Check Out</button>
                 </div>
                 
             </div>
@@ -58,8 +59,9 @@
     <script src="{{url_for('static',filename='assets/js/axios.min.js')}}"></script>
     <script type="text/javascript" charset="utf-8">
         M.AutoInit();
-        let ch = document.querySelector("#check");
-        ch.addEventListener('click',function(){
+        let chIn = document.querySelector("#checkIn");
+        let chOut = document.querySelector("#checkOut");
+        chIn.addEventListener('click',function(){
             let name = document.querySelector("#name");
             let images = document.querySelector("#images");
             let elem = document.querySelector("#modal1");
@@ -68,7 +70,7 @@
             instance.open()
             instance.options.dismissible = false;
             axios.post('/check',{
-                check: 'check'
+                checkIn: 'checkIn'
             })
             .catch(function(error){
                 if(error.message=='Network Error'){
@@ -81,7 +83,7 @@
                 var obj = JSON.parse(datas);
                 if(obj.data == 'n/a'){
                     M.toast({html:"RFID Number Not Found!"})
-                    images.src = '/static/assets/img/logo.png';
+                    images.src = '/static/assets/img/gccnhslogo.png';
                     name.innerText = '';
                     instance.close();
                 }else{
@@ -92,7 +94,46 @@
                     console.log('working');    
                 }
             });
-        })
+        });
+        chOut.addEventListener('click',function(){
+            let name = document.querySelector("#name");
+            let images = document.querySelector("#images");
+            let elem = document.querySelector("#modal1");
+            let options = {dismissible:false,startingTop:'50%'}
+            let instance = M.Modal.getInstance(elem);
+            instance.open()
+            instance.options.dismissible = false;
+            axios.post('/check',{
+                checkOut: 'checkOut'
+            })
+            .catch(function(error){
+                if(error.message=='Network Error'){
+                    M.toast({html:"Time's Up!"})
+                    instance.close()
+                }
+            })
+            .then(function(response,error){
+                var datas = JSON.stringify(response.data);
+                var obj = JSON.parse(datas);
+                if(obj.data == 'n/a'){
+                    M.toast({html:"RFID Number Not Found!"})
+                    images.src = '/static/assets/img/gccnhslogo.png';
+                    name.innerText = '';
+                    instance.close();
+                }else if(obj.data == 'n/c'){
+                    M.toast({html:"Please Check In First!"})
+                    images.src = '/static/assets/img/gccnhslogo.png';
+                    name.innerText = '';
+                    instance.close();
+                }else{
+                    name.innerText = obj.fname +'   ' + obj.mname + '  ' + obj.lname + '  ||  '  + obj.gradelevel  ;
+                    images.src = obj.img;
+                    instance.close();
+                    console.log(obj);
+                    console.log('working');    
+                }
+            });
+        });
     </script>
 </body>
 </html>

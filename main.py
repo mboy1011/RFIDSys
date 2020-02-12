@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 ## i2c ##
 import lcddriver
 import time
-import datetime
+from datetime import datetime
 
 display = lcddriver.lcd()
 #########
@@ -84,7 +84,7 @@ def add_stud():
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                imgurl = '/static/assets/img/'+filename
+                imgurl = './static/assets/img/'+filename
                 query = db.execute(f"INSERT INTO tbl_useraccounts (rfid_no,fname,lname,img,address,mname,gradelevel) VALUES ('{rfid}','{fname}','{lname}','{imgurl}','{address}','{mname}','{gradelevel}')")
                 db.commit()
                 data = {'data':'Successfully Registered!'}
@@ -92,6 +92,7 @@ def add_stud():
 
     else:
         return redirect('/register')
+
 @app.route('/')
 def index():
     return render_template('login.html',async_mode=socketio.async_mode)
@@ -101,19 +102,41 @@ def register():
     return render_template("register.html")
 
 @app.route('/check',methods=['POST'])
-@func_set_timeout(3.0)
+# @func_set_timeout(3.0)
 def check():
     ids = reader.read_id()
-    query = db.execute(f"SELECT DATE_FORMAT(date_added,'%%M %%d %%Y %%l:%%i %%p') as date_added,img,lname,fname,u_id,rfid_no,address,mname,gradelevel FROM tbl_useraccounts WHERE rfid_no = {ids}")
-    data = query.fetchone()
-    if data:
-        json_data = json.dumps(dict(data))
-        return f'''{json_data}'''
-        GPIO.cleanup()
+    req = request.get_json()
+    if request.method == 'POST':
+        query = db.execute(f"SELECT DATE_FORMAT(date_added,'%%M %%d %%Y %%l:%%i %%p') as date_added,img,lname,fname,u_id,rfid_no,address,mname,gradelevel FROM tbl_useraccounts WHERE rfid_no = {ids}")
+        data = query.fetchone()
+        times = time.strftime('%Y-%m-%d %H:%M:%S')
+        if data:
+            if 'checkIn' in req:    
+                # return f'''checkIn{ids}'''
+                q1 = db.execute(f"INSERT INTO tbl_attendance (rfid_no,time_in) VALUES ({ids},NOW())")
+                db.commit()
+                json_data = json.dumps(dict(data))
+                return f'''{json_data}'''
+                GPIO.cleanup()
+            else:
+                # return f'''CheckOut{ids}''''
+                q2 = db.execute(f"SELECT * FROM tbl_attendance WHERE rfid_no like {ids} AND time_in IS NOT NULL AND time_out IS NULL")
+                data2 = q2.fetchall()
+                print(f"I'm A failure: {data2}\n")
+                if data2:    
+                    q3 = db.execute(f"UPDATE tbl_attendance SET time_out=NOW() WHERE rfid_no={ids}")
+                    db.commit()
+                    json_data = json.dumps(dict(data))
+                    return f'''{json_data}'''
+                    GPIO.cleanup()
+                else:
+                    return f'''{json.dumps({'data':'n/c'})}'''
+        else:
+            return f'''{json.dumps({'data':'n/a'})}'''
+            GPIO.cleanup()
     else:
-        return f'''{json.dumps({'data':'n/a'})}'''
+        return f'''{json.dumps({'data':'Invalid Request'})}'''
         GPIO.cleanup()
-
 @app.errorhandler(StatusDenied)
 def handle_invalid_usage(error):
     # response = jsonify(error.to_dict())
@@ -136,6 +159,6 @@ if __name__ == "__main__":
     app.register_error_handler(StatusDenied, error_handler)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     # FLASK_APP = "main"
-    url = "http://localhost:3000"
+    url = "http://169.254.224.234:3000"
     threading.Timer(3.25, lambda: webbrowser.open(url) ).start()
-    socketio.run(app,debug=True,host='localhost',port=3000)
+    socketio.run(app,debug=True,host=ip,port=3000)
